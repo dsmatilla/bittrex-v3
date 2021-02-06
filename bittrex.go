@@ -1,21 +1,21 @@
 package main
 
 import (
+	"bytes"
+	"compress/flate"
+	"crypto/hmac"
+	"crypto/sha512"
+	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
-	"log"
-	"time"
 	"github.com/carterjones/signalr"
 	"github.com/carterjones/signalr/hubs"
 	"github.com/satori/go.uuid"
-	"crypto/hmac"
-	"crypto/sha512"
-	"encoding/hex"
-	"strconv"
-	"bytes"
 	"io/ioutil"
-	"encoding/base64"
-	"compress/flate"
-	"encoding/json"
+	"log"
+	"strconv"
+	"time"
 	//"os"
 )
 
@@ -23,7 +23,7 @@ import (
 // https://github.com/carterjones/bittrex.
 
 const (
-	APIKEY = ""
+	APIKEY    = ""
 	APISECRET = ""
 )
 
@@ -37,7 +37,7 @@ type Ticker struct {
 func main() {
 	createclient()
 	connect()
-    authenticate()
+	authenticate()
 	suscribe()
 
 	// Wait indefinitely.
@@ -65,7 +65,7 @@ func connect() {
 
 func authenticate() {
 	// Authenticate
-	now := time.Now()   
+	now := time.Now()
 	sec := now.Unix() * 1000
 	u1 := uuid.NewV4()
 	timestamp := strconv.FormatInt(sec, 10)
@@ -95,7 +95,7 @@ func suscribe() {
 	err := c.Send(hubs.ClientMsg{
 		H: "c3",
 		M: "Subscribe",
-		A: []interface{}{[...]string{"ticker_XRP-USD","ticker_BTC-USD","ticker_ETH-USD","ticker_DOGE-USD"}},
+		A: []interface{}{[...]string{"ticker_XRP-USD", "ticker_BTC-USD", "ticker_ETH-USD", "ticker_DOGE-USD"}},
 		I: 1,
 	})
 	if err != nil {
@@ -115,7 +115,7 @@ func msghandler(msg signalr.Message) {
 				result, _ := ioutil.ReadAll(r)
 				var tick map[string]interface{}
 				json.Unmarshal(result, &tick)
-				ticker := Ticker {}
+				ticker := Ticker{}
 				ticker.Symbol = fmt.Sprintf("%s", tick["symbol"].(string))
 				ticker.Value, _ = strconv.ParseFloat(fmt.Sprintf("%s", tick["lastTradeRate"].(string)), 64)
 				log.Print(ticker.Symbol)
@@ -132,6 +132,6 @@ func msghandler(msg signalr.Message) {
 	}
 }
 
-func errorlog (err error) {
+func errorlog(err error) {
 	log.Panic(err)
 }
